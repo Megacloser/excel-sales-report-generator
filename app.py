@@ -108,6 +108,9 @@ if st.session_state.report_bytes is not None:
     col2.metric("Orders", len(df))
     col3.metric("Total Revenue", f"${summary['Total Spent'].sum():,.2f}")
 
+    st.subheader("Total Spent by Customer")
+    st.bar_chart(summary.set_index("Customer")["Total Spent"])
+
     st.subheader("Customer Summary")
     st.dataframe(
         summary.style.format({"Total Spent": "${:,.2f}", "% of Total": "{:.1%}"}),
