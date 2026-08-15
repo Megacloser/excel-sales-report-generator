@@ -135,3 +135,12 @@ if st.session_state.report_bytes is not None:
     )
 else:
     st.info("Upload a CSV file and click **Process** to generate the report.")
+
+st.markdown(
+    "<hr style='margin-top: 3em; margin-bottom: 1em; border-color: #eee;'>"
+    "<p style='text-align: center; color: #999; font-size: 0.8em;'>"
+    'Built by Vsevolod "Megacloser" Gergel — '
+    '<a href="https://github.com/Megacloser" target="_blank" style="color: #999;">GitHub</a>'
+    "</p>",
+    unsafe_allow_html=True,
+)
