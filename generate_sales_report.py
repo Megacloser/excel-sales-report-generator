@@ -36,6 +36,14 @@ PERCENT_FORMAT = '0.0%'
 DATE_FORMATS = ["%Y-%m-%d", "%d.%m.%Y", "%m/%d/%Y"]
 DATE_FORMAT_EXAMPLES = "YYYY-MM-DD (2026-01-05), DD.MM.YYYY (05.01.2026), MM/DD/YYYY (01/05/2026)"
 
+# Column headers are matched case-insensitively against these synonyms (EN/RU).
+COLUMN_SYNONYMS = {
+    "Customer": {"customer", "client", "customer name", "client name", "buyer", "клиент", "заказчик", "покупатель", "имя клиента"},
+    "Product": {"product", "item", "sku", "товар", "продукт", "наименование"},
+    "Amount": {"amount", "sum", "total", "price", "sum total", "сумма", "стоимость", "итого"},
+    "Date": {"date", "order date", "purchase date", "transaction date", "дата"},
+}
+
 TITLE_FONT = Font(name="Calibri", color="FFFFFF", bold=True, size=20)
 SUBTITLE_FONT = Font(name="Calibri", color=SUBTLE, italic=True, size=10)
 KPI_FONT = Font(name="Calibri", color="FFFFFF", bold=True, size=11)
@@ -70,9 +78,29 @@ def parse_dates(series: pd.Series) -> pd.Series:
     return result
 
 
+def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename columns to their canonical name by matching case-insensitively
+    against COLUMN_SYNONYMS, so headers like 'client', 'Клиент', or 'CUSTOMER'
+    are all recognized as 'Customer'.
+    """
+    rename_map = {}
+    seen_canonical = set()
+    for col in df.columns:
+        key = col.strip().lower()
+        for canonical, synonyms in COLUMN_SYNONYMS.items():
+            if key == canonical.lower() or key in synonyms:
+                if canonical in seen_canonical:
+                    raise ValueError(f"Multiple columns match '{canonical}': check for duplicate headers")
+                rename_map[col] = canonical
+                seen_canonical.add(canonical)
+                break
+    return df.rename(columns=rename_map)
+
+
 def load_data(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path, encoding="utf-8-sig")
     df.columns = [c.strip() for c in df.columns]
+    df = normalize_columns(df)
     required = {"Customer", "Product", "Amount", "Date"}
     missing = required - set(df.columns)
     if missing:

@@ -5,6 +5,7 @@ A Python tool that turns a raw sales CSV export into a polished, ready-to-share 
 ## Features
 
 - Reads a CSV of transactions (`Customer, Product, Amount, Date`)
+- Column headers are matched case-insensitively and accept common synonyms (e.g. `Customer`/`customer`/`Client`/`Клиент`, `Product`/`Item`/`Товар`, `Amount`/`Sum`/`Сумма`, `Date`/`Дата`)
 - Flexible date parsing — accepts `YYYY-MM-DD`, `DD.MM.YYYY`, or `MM/DD/YYYY`, including mixed formats within the same file
 - Groups and aggregates order count and total spend per customer
 - Produces a two-sheet Excel workbook:

@@ -22,6 +22,10 @@ st.write(
     "polished, presentation-ready Excel report — grouped and totaled by customer."
 )
 st.caption(
+    "Column headers are matched case-insensitively and accept common synonyms — "
+    "e.g. Customer/customer/Client/Клиент, Product/Item/Товар, Amount/Sum/Сумма, Date/Дата."
+)
+st.caption(
     f"Date accepts several formats: {DATE_FORMAT_EXAMPLES}. "
     "Example row: `John Smith, Laptop, 899.99, 2026-01-05`"
 )
