@@ -31,6 +31,11 @@ SUBTLE = "AEB9CC"
 MONEY_FORMAT = '$#,##0.00'
 PERCENT_FORMAT = '0.0%'
 
+# Accepted date formats, tried in order. Distinct separators (-, ., /) keep
+# them unambiguous, so mixed formats within the same column are also supported.
+DATE_FORMATS = ["%Y-%m-%d", "%d.%m.%Y", "%m/%d/%Y"]
+DATE_FORMAT_EXAMPLES = "YYYY-MM-DD (2026-01-05), DD.MM.YYYY (05.01.2026), MM/DD/YYYY (01/05/2026)"
+
 TITLE_FONT = Font(name="Calibri", color="FFFFFF", bold=True, size=20)
 SUBTITLE_FONT = Font(name="Calibri", color=SUBTLE, italic=True, size=10)
 KPI_FONT = Font(name="Calibri", color="FFFFFF", bold=True, size=11)
@@ -52,6 +57,19 @@ RIGHT = Alignment(horizontal="right", vertical="center")
 LEFT = Alignment(horizontal="left", vertical="center")
 
 
+def parse_dates(series: pd.Series) -> pd.Series:
+    """Parse a column of date strings, trying each format in DATE_FORMATS in turn."""
+    result = pd.Series(pd.NaT, index=series.index, dtype="datetime64[ns]")
+    unparsed = result.isna()
+    for fmt in DATE_FORMATS:
+        if not unparsed.any():
+            break
+        attempt = pd.to_datetime(series[unparsed], format=fmt, errors="coerce")
+        result.loc[unparsed] = attempt
+        unparsed = result.isna()
+    return result
+
+
 def load_data(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path, encoding="utf-8-sig")
     df.columns = [c.strip() for c in df.columns]
@@ -60,7 +78,7 @@ def load_data(csv_path: Path) -> pd.DataFrame:
     if missing:
         raise ValueError(f"Missing required columns: {', '.join(sorted(missing))}")
     df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce")
-    df["Date"] = pd.to_datetime(df["Date"], format="%m/%d/%Y", errors="coerce")
+    df["Date"] = parse_dates(df["Date"].astype(str))
     return df
 
 

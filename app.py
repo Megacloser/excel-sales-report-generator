@@ -6,7 +6,13 @@ import pandas as pd
 import streamlit as st
 from openpyxl import Workbook
 
-from generate_sales_report import build_summary, load_data, write_data_sheet, write_summary_sheet
+from generate_sales_report import (
+    DATE_FORMAT_EXAMPLES,
+    build_summary,
+    load_data,
+    write_data_sheet,
+    write_summary_sheet,
+)
 
 st.set_page_config(page_title="Sales Report Generator", page_icon="📊", layout="centered")
 
@@ -14,6 +20,10 @@ st.title("📊 Sales Report Generator")
 st.write(
     "Upload a sales CSV with columns **Customer, Product, Amount, Date** and get a "
     "polished, presentation-ready Excel report — grouped and totaled by customer."
+)
+st.caption(
+    f"Date accepts several formats: {DATE_FORMAT_EXAMPLES}. "
+    "Example row: `John Smith, Laptop, 899.99, 2026-01-05`"
 )
 
 if "report_bytes" not in st.session_state:
