@@ -30,12 +30,30 @@ st.caption(
     "Example row: `John Smith, Laptop, 899.99, 2026-01-05`"
 )
 
+SAMPLE_CSV = """Customer,Product,Amount,Date
+John Smith,Laptop,899.99,2026-01-05
+Emily Davis,Wireless Mouse,24.50,2026-01-05
+John Smith,Keyboard,59.90,2026-01-07
+Michael Brown,Monitor,289.00,2026-01-10
+"""
+
 if "report_bytes" not in st.session_state:
     st.session_state.report_bytes = None
     st.session_state.summary = None
     st.session_state.df = None
 
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+col_upload, col_sample = st.columns([3, 1])
+with col_upload:
+    uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+with col_sample:
+    st.markdown("<div style='height: 28px'></div>", unsafe_allow_html=True)
+    st.download_button(
+        label="Download sample CSV",
+        data=SAMPLE_CSV,
+        file_name="sample_sales_data.csv",
+        mime="text/csv",
+        help="Grab a ready-made example file to try the tool without your own data.",
+    )
 
 if uploaded_file is not None:
     if st.button("Process", type="primary"):
